@@ -19,8 +19,6 @@ services:
     build:
       context: .
       containerfile: Containerfile
-      args:
-        SLURM_TAG: ${SLURM_TAG}
     healthcheck:
       test: ["CMD", "systemctl", "is-active", "slurmdbd"]
       interval: 10s
@@ -39,12 +37,10 @@ services:
 
   slurmctld:
     image: localhost/slurmctld
-    command: ["sleep 30 && systemctl start slurmctld"]
+    command: ["systemctl start slurmctld"]
     build:
       context: .
       containerfile: Containerfile:slurmctld
-      args:
-        SLURM_TAG: ${SLURM_TAG}
     healthcheck:
       test: ["CMD", "systemctl", "is-active", "slurmctld"]
       interval: 10s
@@ -71,8 +67,6 @@ services:
     build:
       context: .
       containerfile: Containerfile:slurmd
-      args:
-        SLURM_TAG: ${SLURM_TAG}
     hostname: c1
     container_name: c1
     volumes:
@@ -94,8 +88,6 @@ services:
     build:
       context: .
       containerfile: Containerfile:slurmd
-      args:
-        SLURM_TAG: ${SLURM_TAG}
     hostname: c2
     container_name: c2
     volumes:

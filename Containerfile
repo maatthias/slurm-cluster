@@ -18,6 +18,8 @@ RUN dnf -y install dnf-plugins-core \
         gcc-c++\
         git \
         gnupg \
+        hostname \
+        htop \
         http-parser-devel \
         json-c-devel \
         jwt \
@@ -70,10 +72,10 @@ RUN set -ex \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
     && make install \
-    # && install -D -m644 /etc/slurm/cgroup.conf \
-    # && install -D -m644 /etc/slurm/slurm.conf \
-    # && install -D -m644 /etc/slurm/slurmdbd.conf \
-    # && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
+    && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf.example \
+    && install -D -m644 etc/slurm.conf.example /etc/slurm/slurm.conf.example \
+    && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
+    && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && popd \
     && rm -rf slurm
 
