@@ -64,20 +64,41 @@ RUN set -x \
     && chown slurm:slurm /etc/slurm/slurmdbd.conf \
     && chmod 600 /etc/slurm/slurmdbd.conf
     
-ARG SLURM_TAG=slurm-24-11-1-1
+# ARG SLURM_TAG=slurm-24-11-1-1
 
-RUN set -ex \
-    && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
-    && pushd slurm \
+# RUN set -ex \
+#     && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
+#     && pushd slurm \
+#     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
+#         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
+#     && make install \
+#     && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf.example \
+#     && install -D -m644 etc/slurm.conf.example /etc/slurm/slurm.conf.example \
+#     && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
+#     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
+#     && popd \
+#     && rm -rf slurm
+
+ARG SLURM_VERSION=24.11.1
+
+WORKDIR /home/slurm
+
+RUN set -x \
+    && wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 \
+    && tar -axf slurm-${SLURM_VERSION}.tar.bz2 \
+    && pushd slurm-${SLURM_VERSION} \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
     && make install \
-    && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf.example \
-    && install -D -m644 etc/slurm.conf.example /etc/slurm/slurm.conf.example \
-    && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
-    && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
-    && popd \
-    && rm -rf slurm
+    && ldconfig -n /usr/lib64
+
+# RUN set -x \
+#     && install -D -m644 /etc/slurm/cgroup.conf /etc/slurm/cgroup.conf \
+#     && install -D -m644 /etc/slurm.conf /etc/slurm/slurm.conf \
+#     && install -D -m644 /etc/slurmdbd.conf /etc/slurm/slurmdbd.conf \
+#     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
+#     && popd \
+#     && rm -rf slurm*
 
 RUN mkdir /etc/sysconfig/slurm \
         /var/spool/slurmd \
