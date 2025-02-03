@@ -32,7 +32,7 @@ podman exec -it c1 sinfo
 ```
 - Allocate and run
 ```sh
-podman exec -it c1 salloc -A nsls2 -p normal -n 1 --mem=0
+podman exec -it c1 salloc -A nsls2 -p normal -n 1 --mem=1MB
 salloc: Granted job allocation 1
 salloc: Nodes c1 are ready for job
 
@@ -69,4 +69,14 @@ JobId=1 JobName=interactive
 c1
 
 sbatch -t 2-00:00:00 --qos=long -n 30 --wrap="srun hostname"
+
+sbatch -vvvvv <<EOF
+#!/bin/bash
+#SBATCH --output=/tmp/slurm_job_%j.log
+#SBATCH --job-name=slurm_job
+#SBATCH --ntasks=1
+#SBATCH --partition=normal
+
+hostname && sinfo
+EOF
 ```
