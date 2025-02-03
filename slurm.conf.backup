@@ -51,19 +51,23 @@ MinJobAge=300
 KillWait=30
 Waittime=0
 #
-#
 # SCHEDULING
-#
-SchedulerType            = sched/backfill
-SelectType               = select/cons_tres
-SelectTypeParameters     = CR_Core_Memory
-# DefMemPerCPU             = 16000
-#PreemptType              = preempt/qos
-PreemptMode              = off
-PrologFlags              = Alloc,Contain,X11
-SchedulerParameters      = bf_max_job_test=500,default_queue_depth=500,bf_window=2880
-# DisableRootJobs          = yes
-
+SchedulerType=sched/backfill
+#SchedulerAuth=
+#SchedulerPort=
+#SchedulerRootFilter=
+SelectType=select/cons_tres
+# SelectTypeParameters=CR_CPU_Memory
+SelectTypeParameters=CR_Core_Memory
+FastSchedule=1
+#PriorityType=priority/multifactor
+#PriorityDecayHalfLife=14-0
+#PriorityUsageResetPeriod=14-0
+#PriorityWeightFairshare=100000
+#PriorityWeightAge=1000
+#PriorityWeightPartition=10000
+#PriorityWeightJobSize=1000
+#PriorityMaxAge=1-0
 #
 # LOGGING
 SlurmctldDebug=3
