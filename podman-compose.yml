@@ -15,7 +15,7 @@ services:
 
   slurmdbd:
     image: localhost/slurmdbd
-    command: ["systemctl", "start", "slurmdbd"]
+    command: "systemctl start slurmdbd"
     healthcheck:
       test: ["CMD", "systemctl", "is-active", "slurmdbd"]
       interval: 10s
@@ -32,73 +32,64 @@ services:
     networks:
       - slurm-network
 
-  # slurmctld:
-  #   image: localhost/slurmctld
-  #   command: ["systemctl start slurmctld"]
-  #   build:
-  #     context: .
-  #     containerfile: Containerfile
-  #   healthcheck:
-  #     test: ["CMD", "systemctl", "is-active", "slurmctld"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   container_name: slurmctld
-  #   hostname: slurmctld
-  #   volumes:
-  #     - etc_munge:/etc/munge
-  #     - etc_slurm:/etc/slurm
-  #     - slurm_jobdir:/data
-  #     - var_log_slurm:/var/log/slurm
-  #   expose:
-  #     - "6817"
-  #   depends_on:
-  #     slurmdbd:
-  #       condition: service_healthy
-  #   networks:
-  #     - slurm-network
+  slurmctld:
+    image: localhost/slurmctld
+    command: ["systemctl start slurmctld"]
+    healthcheck:
+      test: ["CMD", "systemctl", "is-active", "slurmctld"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    container_name: slurmctld
+    hostname: slurmctld
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6817"
+    depends_on:
+      slurmdbd:
+        condition: service_healthy
+    networks:
+      - slurm-network
 
-  # c1:
-  #   image: localhost/slurmd
-  #   command: "systemctl start slurmd"
-  #   build:
-  #     context: .
-  #     containerfile: Containerfile
-  #   hostname: c1
-  #   container_name: c1
-  #   volumes:
-  #     - etc_munge:/etc/munge
-  #     - etc_slurm:/etc/slurm
-  #     - slurm_jobdir:/data
-  #     - var_log_slurm:/var/log/slurm
-  #   expose:
-  #     - "6818"
-  #   depends_on:
-  #     slurmctld:
-  #       condition: service_healthy
-  #   networks:
-  #     - slurm-network
+  c1:
+    image: localhost/slurmd
+    command: "systemctl start slurmd"
+    hostname: c1
+    container_name: c1
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6818"
+    depends_on:
+      slurmctld:
+        condition: service_healthy
+    networks:
+      - slurm-network
 
-  # c2:
-  #   image: localhost/slurmd
-  #   command: "systemctl start slurmd"
-  #   build:
-  #     context: .
-  #     containerfile: Containerfile
-  #   hostname: c2
-  #   container_name: c2
-  #   volumes:
-  #     - etc_munge:/etc/munge
-  #     - etc_slurm:/etc/slurm
-  #     - slurm_jobdir:/data
-  #     - var_log_slurm:/var/log/slurm
-  #   expose:
-  #     - "6818"
-  #   depends_on:
-  #     slurmctld:
-  #       condition: service_healthy
-  #   networks:
-  #     - slurm-network
+  c2:
+    image: localhost/slurmd
+    command: "systemctl start slurmd"
+    hostname: c2
+    container_name: c2
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6818"
+    depends_on:
+      slurmctld:
+        condition: service_healthy
+    networks:
+      - slurm-network
 
 volumes:
   etc_munge:
