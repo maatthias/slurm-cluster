@@ -15,10 +15,7 @@ services:
 
   slurmdbd:
     image: localhost/slurmdbd
-    command: ["systemctl start slurmdbd"]
-    build:
-      context: .
-      containerfile: Containerfile
+    command: "systemctl start slurmdbd"
     healthcheck:
       test: ["CMD", "systemctl", "is-active", "slurmdbd"]
       interval: 10s
@@ -38,9 +35,6 @@ services:
   slurmctld:
     image: localhost/slurmctld
     command: ["systemctl start slurmctld"]
-    build:
-      context: .
-      containerfile: Containerfile
     healthcheck:
       test: ["CMD", "systemctl", "is-active", "slurmctld"]
       interval: 10s
@@ -64,9 +58,6 @@ services:
   c1:
     image: localhost/slurmd
     command: "systemctl start slurmd"
-    build:
-      context: .
-      containerfile: Containerfile
     hostname: c1
     container_name: c1
     volumes:
@@ -85,9 +76,6 @@ services:
   c2:
     image: localhost/slurmd
     command: "systemctl start slurmd"
-    build:
-      context: .
-      containerfile: Containerfile
     hostname: c2
     container_name: c2
     volumes:

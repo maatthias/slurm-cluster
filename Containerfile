@@ -2,10 +2,8 @@ FROM fedora:41 AS slurm
 
 RUN set -ex \
     && dnf makecache \
-    && dnf -y update
-
-RUN dnf -y install dnf-plugins-core \
-    # && dnf config-manager --enable crb \
+    && dnf -y update \
+    && dnf -y install dnf-plugins-core \
     && dnf -y install \
         autoconf \
         automake \
@@ -31,7 +29,6 @@ RUN dnf -y install dnf-plugins-core \
         make \
         mariadb-devel \
         mariadb-server \
-        # munge contains munged daemon, mungekey executable, and client executables (munge, unmunge, and remunge)
         munge \
         munge-devel \
         munge-libs \
@@ -57,27 +54,20 @@ RUN dnf -y install dnf-plugins-core \
 RUN groupadd -r --gid=990 slurm \
     && useradd -r -g slurm --uid=990 slurm
 
-COPY slurm.conf /etc/slurm/slurm.conf
-COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
-COPY cgroup.conf /etc/slurm/cgroup.conf
-RUN set -x \
-    && chown slurm:slurm /etc/slurm/slurmdbd.conf \
-    && chmod 600 /etc/slurm/slurmdbd.conf
-    
-ARG SLURM_TAG=slurm-24-11-1-1
+ARG SLURM_VERSION=24.11.1
 
-RUN set -ex \
-    && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
-    && pushd slurm \
+WORKDIR /home/slurm
+
+RUN set -x \
+    && wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 \
+    && tar -axf slurm-${SLURM_VERSION}.tar.bz2 \
+    && pushd slurm-${SLURM_VERSION} \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \
         --with-mysql_config=/usr/bin  --libdir=/usr/lib64 \
     && make install \
-    && install -D -m644 etc/cgroup.conf.example /etc/slurm/cgroup.conf.example \
-    && install -D -m644 etc/slurm.conf.example /etc/slurm/slurm.conf.example \
-    && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
-    && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
+    && ldconfig -n /usr/lib64 \
     && popd \
-    && rm -rf slurm
+    && rm -rf slurm*
 
 RUN mkdir /etc/sysconfig/slurm \
         /var/spool/slurmd \
@@ -131,9 +121,14 @@ RUN mkdir -p /etc/sysconfig/slurm \
         /var/lib/slurmd/fed_mgr_state \
     && chown -R slurm:slurm /var/*/slurm*
 
+COPY slurm.conf /etc/slurm/slurm.conf
+COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
+COPY cgroup.conf /etc/slurm/cgroup.conf
+RUN set -x \
+    && chown slurm:slurm /etc/slurm/slurmdbd.conf \
+    && chmod 600 /etc/slurm/slurmdbd.conf
+    
 RUN systemctl enable munge
-
-ENTRYPOINT ["/usr/sbin/init"]
 
 FROM slurm AS slurmdbd
 

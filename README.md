@@ -67,4 +67,6 @@ JobId=1 JobName=interactive
 
 [root@c1 munge-0.5.13]# srun hostname
 c1
+
+sbatch -t 2-00:00:00 --qos=long -n 30 --wrap="srun hostname"
 ```
