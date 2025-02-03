@@ -32,7 +32,7 @@ podman exec -it c1 sinfo
 ```
 - Allocate and run
 ```sh
-podman exec -it c1 salloc -A linux -p normal -n 1 --mem=0
+podman exec -it c1 salloc -A nsls2 -p normal -n 1 --mem=0
 salloc: Granted job allocation 1
 salloc: Nodes c1 are ready for job
 

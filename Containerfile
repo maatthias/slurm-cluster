@@ -19,6 +19,7 @@ RUN set -ex \
         hostname \
         htop \
         http-parser-devel \
+        hwloc \
         json-c-devel \
         jwt \
         kernel-headers \
