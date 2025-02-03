@@ -40,7 +40,7 @@ services:
     command: ["systemctl start slurmctld"]
     build:
       context: .
-      containerfile: Containerfile:slurmctld
+      containerfile: Containerfile
     healthcheck:
       test: ["CMD", "systemctl", "is-active", "slurmctld"]
       interval: 10s
@@ -66,7 +66,7 @@ services:
     command: "systemctl start slurmd"
     build:
       context: .
-      containerfile: Containerfile:slurmd
+      containerfile: Containerfile
     hostname: c1
     container_name: c1
     volumes:
@@ -87,7 +87,7 @@ services:
     command: "systemctl start slurmd"
     build:
       context: .
-      containerfile: Containerfile:slurmd
+      containerfile: Containerfile
     hostname: c2
     container_name: c2
     volumes:

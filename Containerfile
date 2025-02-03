@@ -133,6 +133,8 @@ RUN mkdir -p /etc/sysconfig/slurm \
 
 RUN systemctl enable munge
 
+ENTRYPOINT ["/usr/sbin/init"]
+
 FROM slurm AS slurmdbd
 
 RUN systemctl enable slurmdbd
