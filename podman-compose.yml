@@ -55,11 +55,11 @@ services:
     networks:
       - slurm-network
 
-  c1:
+  saturn4:
     image: localhost/slurmd
     command: "systemctl start slurmd"
-    hostname: c1
-    container_name: c1
+    hostname: saturn4
+    container_name: saturn4
     volumes:
       - etc_munge:/etc/munge
       - etc_slurm:/etc/slurm
@@ -73,23 +73,41 @@ services:
     networks:
       - slurm-network
 
-  c2:
-    image: localhost/slurmd
-    command: "systemctl start slurmd"
-    hostname: c2
-    container_name: c2
-    volumes:
-      - etc_munge:/etc/munge
-      - etc_slurm:/etc/slurm
-      - slurm_jobdir:/data
-      - var_log_slurm:/var/log/slurm
-    expose:
-      - "6818"
-    depends_on:
-      slurmctld:
-        condition: service_healthy
-    networks:
-      - slurm-network
+  # c1:
+  #   image: localhost/slurmd
+  #   command: "systemctl start slurmd"
+  #   hostname: c1
+  #   container_name: c1
+  #   volumes:
+  #     - etc_munge:/etc/munge
+  #     - etc_slurm:/etc/slurm
+  #     - slurm_jobdir:/data
+  #     - var_log_slurm:/var/log/slurm
+  #   expose:
+  #     - "6818"
+  #   depends_on:
+  #     slurmctld:
+  #       condition: service_healthy
+  #   networks:
+  #     - slurm-network
+
+  # c2:
+  #   image: localhost/slurmd
+  #   command: "systemctl start slurmd"
+  #   hostname: c2
+  #   container_name: c2
+  #   volumes:
+  #     - etc_munge:/etc/munge
+  #     - etc_slurm:/etc/slurm
+  #     - slurm_jobdir:/data
+  #     - var_log_slurm:/var/log/slurm
+  #   expose:
+  #     - "6818"
+  #   depends_on:
+  #     slurmctld:
+  #       condition: service_healthy
+  #   networks:
+  #     - slurm-network
 
 volumes:
   etc_munge:
