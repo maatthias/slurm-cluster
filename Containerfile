@@ -70,61 +70,49 @@ RUN set -x \
     && popd \
     && rm -rf slurm*
 
-RUN mkdir /etc/sysconfig/slurm \
-        /var/spool/slurmd \
-        /var/run/slurmd \
-        /var/run/slurmdbd \
-        /var/lib/slurmd \
-        /data \
-    && touch /var/lib/slurmd/node_state \
-        /var/lib/slurmd/front_end_state \
-        /var/lib/slurmd/job_state \
-        /var/lib/slurmd/resv_state \
-        /var/lib/slurmd/trigger_state \
-        /var/lib/slurmd/assoc_mgr_state \
-        /var/lib/slurmd/assoc_usage \
-        /var/lib/slurmd/qos_usage \
-        /var/lib/slurmd/fed_mgr_state \
-    && chown -R slurm:slurm /var/*/slurm*
+RUN mkdir -p /etc/sysconfig/slurm \
+    /var/spool/slurmd \
+    /var/run/slurmd \
+    /var/run/slurmdbd \
+    /var/lib/slurmd \
+    /var/log/slurm \
+    /data \
+&& touch /var/lib/slurmd/node_state \
+    /var/lib/slurmd/front_end_state \
+    /var/lib/slurmd/job_state \
+    /var/lib/slurmd/resv_state \
+    /var/lib/slurmd/trigger_state \
+    /var/lib/slurmd/assoc_mgr_state \
+    /var/lib/slurmd/assoc_usage \
+    /var/lib/slurmd/qos_usage \
+    /var/lib/slurmd/fed_mgr_state \
+&& chown -R slurm:slurm /var/*/slurm*
 
 ARG MUNGE_VERSION=0.5.13
 
 WORKDIR /tmp    
 RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz
-RUN tar xJf munge-${MUNGE_VERSION}.tar.xz
-WORKDIR /tmp/munge-${MUNGE_VERSION}
-RUN ./configure \
+RUN tar xJf munge-${MUNGE_VERSION}.tar.xz \
+    && pushd munge-${MUNGE_VERSION} \
+    && ./configure \
         --prefix=/usr \
         --sysconfdir=/etc \
         --localstatedir=/var \
-        --runstatedir=/run
-RUN make
-RUN make check
-RUN make install
+        --runstatedir=/run \
+    && make \
+    && make check \
+    && make install \
+    && popd \
+    && rm -rf munge*
 
+WORKDIR /root
 RUN sudo -u munge /usr/sbin/mungekey --verbose
-
-RUN mkdir -p /etc/sysconfig/slurm \
-        /var/spool/slurmd \
-        /var/run/slurmd \
-        /var/run/slurmdbd \
-        /var/lib/slurmd \
-        /var/log/slurm \
-        /data \
-    && touch /var/lib/slurmd/node_state \
-        /var/lib/slurmd/front_end_state \
-        /var/lib/slurmd/job_state \
-        /var/lib/slurmd/resv_state \
-        /var/lib/slurmd/trigger_state \
-        /var/lib/slurmd/assoc_mgr_state \
-        /var/lib/slurmd/assoc_usage \
-        /var/lib/slurmd/qos_usage \
-        /var/lib/slurmd/fed_mgr_state \
-    && chown -R slurm:slurm /var/*/slurm*
 
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 COPY cgroup.conf /etc/slurm/cgroup.conf
+COPY topology.conf /etc/slurm/topology.conf
+
 RUN set -x \
     && chown slurm:slurm /etc/slurm/slurmdbd.conf \
     && chmod 600 /etc/slurm/slurmdbd.conf
