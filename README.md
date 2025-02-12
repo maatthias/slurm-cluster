@@ -28,45 +28,40 @@ podman-compose down --volumes
 ## Interact
 - Check
 ```sh
-podman exec -it c1 sinfo
+podman exec -it saturn4 bash
 ```
 - Allocate and run
 ```sh
-podman exec -it c1 salloc -A nsls2 -p normal -n 1 --mem=1MB
-salloc: Granted job allocation 1
-salloc: Nodes c1 are ready for job
+[root@saturn4 ~]# salloc -M nsls2 --partition=jupyter-staff-chx --job-name=spawner-jupyterhub --ntasks=1 --time=7-1 --mem=0 --cpus-per-task=1
+salloc: Granted job allocation 2
+salloc: Nodes saturn4 are ready for job
 
-[root@c1 munge-0.5.13]# squeue
-             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-                 1    normal interact     root  R       2:57      1 c1
-
-[root@c1 munge-0.5.13]# scontrol show job 1
-JobId=1 JobName=interactive
+[root@saturn4 slurmstepd.scope]# scontrol show job 2
+JobId=2 JobName=spawner-jupyterhub
    UserId=root(0) GroupId=root(0) MCS_label=N/A
-   Priority=1 Nice=0 Account=root QOS=normal
+   Priority=313940 Nice=0 Account=root QOS=normal
    JobState=RUNNING Reason=None Dependency=(null)
    Requeue=1 Restarts=0 BatchFlag=0 Reboot=0 ExitCode=0:0
-   RunTime=00:03:15 TimeLimit=5-00:00:00 TimeMin=N/A
-   SubmitTime=2025-02-03T11:26:30 EligibleTime=2025-02-03T11:26:30
+   RunTime=00:00:34 TimeLimit=7-01:00:00 TimeMin=N/A
+   SubmitTime=2025-02-12T17:51:23 EligibleTime=2025-02-12T17:51:23
    AccrueTime=Unknown
-   StartTime=2025-02-03T11:26:30 EndTime=2025-02-08T11:26:30 Deadline=N/A
-   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2025-02-03T11:26:30 Scheduler=Main
-   Partition=normal AllocNode:Sid=c1:135
+   StartTime=2025-02-12T17:51:23 EndTime=2025-02-19T18:51:23 Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2025-02-12T17:51:23 Scheduler=Main
+   Partition=jupyter-staff-chx AllocNode:Sid=saturn4:351
    ReqNodeList=(null) ExcNodeList=(null)
-   NodeList=c1
-   BatchHost=c1
+   NodeList=saturn4
+   BatchHost=saturn4
    NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
    ReqTRES=cpu=1,mem=1000M,node=1,billing=1
-   AllocTRES=cpu=1,mem=1000M,node=1,billing=1
+   AllocTRES=cpu=1,node=1,billing=1
    Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
    MinCPUsNode=1 MinMemoryNode=0 MinTmpDiskNode=0
    Features=(null) DelayBoot=00:00:00
-   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   OverSubscribe=YES Contiguous=0 Licenses=(null) Network=(null)
    Command=/bin/bash
-   WorkDir=/tmp/munge-0.5.13
-
-[root@c1 munge-0.5.13]# srun hostname
-c1
+   WorkDir=/root
+   TresPerTask=cpu=1
+   
 
 sbatch -t 2-00:00:00 --qos=long -n 30 --wrap="srun hostname"
 
@@ -75,7 +70,10 @@ sbatch -vvvvv <<EOF
 #SBATCH --output=/tmp/slurm_job_%j.log
 #SBATCH --job-name=slurm_job
 #SBATCH --ntasks=1
-#SBATCH --partition=normal
+#SBATCH --partition=jupyter-staff-chx
+#SBATCH --time=7-1
+#SBATCH --mem=0
+#SBATCH --cpus-per-task=1
 
 hostname && sinfo
 EOF
