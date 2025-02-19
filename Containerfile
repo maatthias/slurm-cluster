@@ -1,4 +1,4 @@
-FROM fedora:41 AS slurm
+FROM almalinux:9 AS slurm
 
 RUN set -ex \
     && dnf makecache \
@@ -17,21 +17,22 @@ RUN set -ex \
         git \
         gnupg \
         hostname \
-        htop \
-        http-parser-devel \
+        # htop \
+        # http-parser-devel \
         hwloc \
-        json-c-devel \
-        jwt \
+        # json-c-devel \
+        # jwt \
         kernel-headers \
         libbpf \
         libgcrypt \
         libtool \
         libyaml \
         make \
-        mariadb-devel \
+        # mariadb-devel \
+        mariadb-connector-c-devel.x86_64 \
         mariadb-server \
         munge \
-        munge-devel \
+        # munge-devel \
         munge-libs \
         openssl \
         pam-devel \
@@ -42,9 +43,10 @@ RUN set -ex \
         python3-pip \
         python3 \
         readline-devel \
-        slurm-slurmctld \
-        slurm-slurmd \
-        slurm-slurmdbd \
+        # slurm-slurmctld \
+        # slurm-slurmd \
+        # slurm-slurmdbd \
+        sudo \
         systemd \
         vim-enhanced \
         wget \
@@ -55,6 +57,23 @@ RUN set -ex \
 RUN groupadd -r --gid=990 slurm \
     && useradd -r -g slurm --uid=990 slurm
 
+ARG MUNGE_VERSION=0.5.13
+
+WORKDIR /tmp    
+RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz
+RUN tar xJf munge-${MUNGE_VERSION}.tar.xz \
+    && pushd munge-${MUNGE_VERSION} \
+    && ./configure \
+        --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --runstatedir=/run \
+    && make \
+    && make check \
+    && make install \
+    && popd \
+    && rm -rf munge*
+    
 ARG SLURM_VERSION=24.11.1
 
 WORKDIR /home/slurm
@@ -88,25 +107,8 @@ RUN mkdir -p /etc/sysconfig/slurm \
     /var/lib/slurmd/fed_mgr_state \
 && chown -R slurm:slurm /var/*/slurm*
 
-ARG MUNGE_VERSION=0.5.13
-
-WORKDIR /tmp    
-RUN wget https://github.com/dun/munge/releases/download/munge-${MUNGE_VERSION}/munge-${MUNGE_VERSION}.tar.xz
-RUN tar xJf munge-${MUNGE_VERSION}.tar.xz \
-    && pushd munge-${MUNGE_VERSION} \
-    && ./configure \
-        --prefix=/usr \
-        --sysconfdir=/etc \
-        --localstatedir=/var \
-        --runstatedir=/run \
-    && make \
-    && make check \
-    && make install \
-    && popd \
-    && rm -rf munge*
-
 WORKDIR /root
-RUN sudo -u munge /usr/sbin/mungekey --verbose
+# RUN sudo -u munge /usr/sbin/mungekey --verbose
 
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
@@ -121,7 +123,7 @@ RUN systemctl enable munge
 
 FROM slurm AS slurmdbd
 
-RUN systemctl enable slurmdbd
+# RUN systemctl enable slurmdbd
 
 ENTRYPOINT ["/usr/sbin/init"]
 
